@@ -1,0 +1,139 @@
+from __future__ import annotations
+
+import argparse
+from pathlib import Path
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
+from src.wisdm import SENSOR_COLUMNS, class_distribution, markdown_table
+
+
+plt.style.use("seaborn-v0_8-whitegrid")
+
+
+def savefig(path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    plt.tight_layout()
+    plt.savefig(path, dpi=200, bbox_inches="tight")
+    plt.close()
+
+
+def generate_figures(clean_data: Path, figures_dir: Path, summary_path: Path) -> None:
+    figures_dir.mkdir(parents=True, exist_ok=True)
+    df = pd.read_csv(clean_data)
+
+    class_dist = class_distribution(df)
+    plt.figure(figsize=(10, 5))
+    plt.bar(class_dist["activity_name"], class_dist["rows"], color="#2F6B7C")
+    plt.xticks(rotation=45, ha="right")
+    plt.ylabel("Raw samples")
+    plt.title("Class distribution")
+    savefig(figures_dir / "class_distribution.png")
+
+    subject_counts = df.groupby("subject_id", observed=True).size().reset_index(name="samples")
+    plt.figure(figsize=(12, 4.8))
+    plt.bar(subject_counts["subject_id"].astype(str), subject_counts["samples"], color="#6B8E23")
+    plt.xticks(rotation=90)
+    plt.ylabel("Raw samples")
+    plt.title("Samples per subject")
+    savefig(figures_dir / "samples_per_subject.png")
+
+    activities = ["walking", "jogging", "sitting", "typing"]
+    fig, axes = plt.subplots(len(activities), 1, figsize=(11, 8), sharex=False)
+    for ax, activity in zip(axes, activities):
+        sample = df[df["activity_name"] == activity].head(300).copy()
+        sample["relative_seconds"] = (sample["timestamp_ns"] - sample["timestamp_ns"].iloc[0]) / 1_000_000_000
+        for axis in SENSOR_COLUMNS:
+            ax.plot(sample["relative_seconds"], sample[axis], label=axis, linewidth=1)
+        ax.set_title(activity)
+        ax.set_ylabel("sensor value")
+    axes[-1].set_xlabel("relative seconds")
+    axes[0].legend(ncol=3, loc="upper right")
+    fig.suptitle("Example phone accelerometer signals")
+    savefig(figures_dir / "signal_examples.png")
+
+    axis_stats = (
+        df.groupby("activity_name", observed=True)[SENSOR_COLUMNS]
+        .agg(["mean", "std"])
+        .sort_index()
+    )
+    mean_stats = axis_stats.xs("mean", axis=1, level=1)
+    plt.figure(figsize=(11, 5))
+    x = np.arange(len(mean_stats))
+    width = 0.25
+    for i, axis in enumerate(SENSOR_COLUMNS):
+        plt.bar(x + (i - 1) * width, mean_stats[axis], width=width, label=axis)
+    plt.xticks(x, mean_stats.index, rotation=45, ha="right")
+    plt.ylabel("Mean sensor value")
+    plt.title("Per-axis mean by class")
+    plt.legend()
+    savefig(figures_dir / "per_axis_means.png")
+
+    imbalance = class_dist.copy()
+    imbalance["relative_to_largest"] = imbalance["rows"] / imbalance["rows"].max()
+    plt.figure(figsize=(10, 5))
+    plt.bar(imbalance["activity_name"], imbalance["relative_to_largest"], color="#9A4D4D")
+    plt.axhline(1.0, color="black", linewidth=0.8)
+    plt.xticks(rotation=45, ha="right")
+    plt.ylabel("Fraction of largest class")
+    plt.title("Class imbalance")
+    savefig(figures_dir / "class_imbalance.png")
+
+    pivot = df.pivot_table(index="subject_id", columns="activity_name", values="x", aggfunc="count", fill_value=0, observed=True)
+    plt.figure(figsize=(12, 7))
+    plt.imshow(pivot.to_numpy(), aspect="auto", cmap="viridis")
+    plt.colorbar(label="samples")
+    plt.yticks(np.arange(len(pivot.index)), pivot.index)
+    plt.xticks(np.arange(len(pivot.columns)), pivot.columns, rotation=45, ha="right")
+    plt.ylabel("subject_id")
+    plt.title("Subject variability: samples by class")
+    savefig(figures_dir / "subject_activity_heatmap.png")
+
+    issue_lines = [
+        "The raw task is moderately imbalanced; some activity classes have fewer samples than the largest class.",
+        "Several subjects have noticeably different sample volumes, which supports subject-wise splitting and macro-averaged metrics.",
+        "Signal traces show large amplitude differences between locomotion and hand/object activities, so models may learn activity intensity strongly.",
+        "Subject variability should be treated as a modeling risk; final metrics should emphasize macro F1 and per-class performance, not accuracy alone.",
+    ]
+    lines = [
+        "# EDA Summary",
+        "",
+        "## Generated figures",
+        "",
+        "- `figures/class_distribution.png`",
+        "- `figures/samples_per_subject.png`",
+        "- `figures/signal_examples.png`",
+        "- `figures/per_axis_means.png`",
+        "- `figures/class_imbalance.png`",
+        "- `figures/subject_activity_heatmap.png`",
+        "",
+        "## Class distribution",
+        "",
+        markdown_table(class_dist),
+        "",
+        "## Issues highlighted by EDA",
+        "",
+        *[f"- {line}" for line in issue_lines],
+        "",
+        "Generated by `eda.py` and mirrored in `eda.ipynb`.",
+        "",
+    ]
+    summary_path.write_text("\n".join(lines), encoding="utf-8")
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Generate WISDM EDA figures.")
+    parser.add_argument("--clean-data", type=Path, default=Path("data/processed/phone_accel_clean.csv.gz"))
+    parser.add_argument("--figures-dir", type=Path, default=Path("figures"))
+    parser.add_argument("--summary", type=Path, default=Path("eda_summary.md"))
+    args = parser.parse_args()
+
+    generate_figures(args.clean_data, args.figures_dir, args.summary)
+    print(f"Wrote figures to {args.figures_dir}")
+    print(f"Wrote {args.summary}")
+
+
+if __name__ == "__main__":
+    main()

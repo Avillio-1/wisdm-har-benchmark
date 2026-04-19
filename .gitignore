@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.python-version
+
+# Virtual environments and local config
+.venv/
+venv/
+env/
+.env
+.env.*
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS/editor artifacts
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Raw and generated data
+wisdm-dataset/
+data/interim/
+data/processed/
+
+# Profiling and cache artifacts
+*.prof
+*.pstats
+
+# Model artifacts
+*.joblib
+*.pkl
+*.h5
+*.keras
+*.pt
+*.pth
+
+# Logs
+*.log
