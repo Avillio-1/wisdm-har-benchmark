@@ -1,0 +1,33 @@
+# Large or reproducible data artifacts
+data/
+*.npz
+*.parquet
+*.csv.gz
+
+# Model/checkpoint artifacts
+models/
+checkpoints/
+*.pt
+*.pth
+*.joblib
+*.pkl
+
+# Local smoke-test and scratch outputs
+smoke_data/
+smoke_results/
+smoke_reports/
+_wording_tmp_results/
+_wording_tmp_reports/
+scratch/
+tmp/
+
+# Python/runtime cache
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# OS/editor/log noise
+.DS_Store
+Thumbs.db
+*.log
+*.tmp

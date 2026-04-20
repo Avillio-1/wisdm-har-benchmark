@@ -1,0 +1,7 @@
+,locomotion,stairs,static,eat_drink,sports,upper_body
+locomotion,1002,329,0,0,18,3
+stairs,18,660,0,3,83,11
+static,0,5,6,625,108,1065
+eat_drink,0,15,3,1749,67,1730
+sports,70,393,0,13,1452,135
+upper_body,13,75,11,625,267,3119

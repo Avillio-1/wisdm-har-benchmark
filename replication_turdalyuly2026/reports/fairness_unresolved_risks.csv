@@ -1,0 +1,7 @@
+issue,risk,action
+Exact author code unavailable,"CNN architecture, layer widths, initialization, fold ordering, and preprocessing edge cases cannot be guaranteed identical.",Do not claim an exact clone; claim independently implemented reproduction under disclosed conditions.
+Official supplementary file not retrievable from this environment,"MDPI blocked direct supplementary ZIP download attempts, so we could not inspect possible hidden code/configs.","If a browser download succeeds, compare the official supplement against this package before final submission."
+6-class mapping not fully enumerated in the paper text,Our mapping is a documented interpretation of the named categories using the official WISDM activity key.,Report the full mapping in the paper and appendix.
+Timestamp alignment details are underspecified,"The paper says aligned by timestamp, but does not disclose exact-match vs tolerance/resampling behavior.",Report exact timestamp inner join and aligned-row counts; avoid claiming identical preprocessing.
+Published CNN result is not reproduced numerically,"Our CNN macro-F1 is higher than all reported 4.0 s CNN targets, so the CNN is not a perfect replica.",Use CNN as calibration only; base the contribution on same-protocol proposed method comparison.
+Classical feature models are a different method family,They are not a replication of the paper's CNN and should not be described as the same model.,Frame XGBoost stats+freq as our proposed model evaluated under the same disclosed data/protocol.

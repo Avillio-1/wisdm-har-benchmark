@@ -1,0 +1,4 @@
+paper_result,paper_macro_f1,paper_std,our_macro_f1,delta,within_one_paper_std
+table1_model_comparison_cnn_4s_accel_gyro,0.4626,0.0408,0.546923274802144,0.08432327480214397,False
+table3_window_length_cnn_4s,0.4473,0.0525,0.546923274802144,0.099623274802144,False
+table4_sensor_ablation_accel_gyro,0.4535,0.0643,0.546923274802144,0.09342327480214396,False

@@ -1,0 +1,6 @@
+fold,train_subjects,eval_subjects,eval_windows,subject_overlap,missing_eval_classes
+1,41,10,13561,0,0
+2,41,10,13673,0,0
+3,41,10,13562,0,0
+4,40,11,13648,0,0
+5,41,10,13650,0,0

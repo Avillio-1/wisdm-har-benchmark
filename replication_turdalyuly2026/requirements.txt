@@ -1,0 +1,10 @@
+numpy
+pandas
+pyarrow
+scikit-learn
+lightgbm
+xgboost
+
+# Install CUDA-enabled PyTorch separately when running the CNN calibration.
+# Example for the environment used here:
+# python -m pip install --no-cache-dir --timeout 1000 --retries 10 torch --index-url https://download.pytorch.org/whl/cu128

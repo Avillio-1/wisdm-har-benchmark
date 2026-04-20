@@ -1,0 +1,11 @@
+condition,paper,ours,status
+Dataset,WISDM507,WISDM Smartphone and Smartwatch raw phone streams,matched disclosed dataset
+Sensor input,"phone accel + gyro, 6 channels","phone accel + gyro, 6 channels",matched
+Window length,4.0 s primary,4.0 s,matched
+Overlap,50%,50%,matched
+Labeling,majority vote,majority vote,matched
+Evaluation,5-fold GroupKFold by subject,5-fold GroupKFold by subject,matched
+Normalization,train-fold z-score only,train-fold z-score only for CNN; sklearn train-fold pipelines for features,matched for implemented models
+Optimizer,"AdamW, lr=1e-3","AdamW, lr=1e-3 for CNN",matched
+Epochs/batch size,"10 epochs, train batch 256, eval batch 512","10 epochs, train batch 256, eval batch 512",matched
+GPU,CUDA mixed precision when available,CUDA required by default; fold metrics recorded device=cuda,matched/improved enforcement
